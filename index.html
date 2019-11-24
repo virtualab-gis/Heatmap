@@ -1,49 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Leaflet.heat demo</title>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-    <style>
-        #map { width: 800px; height: 600px; }
-        body { font: 16px/1.4 "Helvetica Neue", Arial, sans-serif; }
-        .ghbtns { position: relative; top: 4px; margin-left: 5px; }
-        a { color: #0077ff; }
-    </style>
-</head>
-<body>
+// don't forget to include leaflet-heatmap.js
+var testData = {
+  max: 8,
+  data: [{lat: 24.6408, lng:46.7728, count: 3},{lat: 50.75, lng:-1.55, count: 1}, ...]
+};
 
-<p>
-    A dynamic demo of <a href="https://github.com/Leaflet/Leaflet.heat">Leaflet.heat</a>, a tiny and fast Leaflet heatmap plugin.
-    <iframe class="ghbtns" src="http://ghbtns.com/github-btn.html?user=Leaflet&amp;repo=Leaflet.heat&amp;type=watch&amp;count=true"
-  allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
-</p>
+var baseLayer = L.tileLayer(
+  'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution: '...',
+    maxZoom: 18
+  }
+);
 
-<div id="map"></div>
+var cfg = {
+  // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+  // if scaleRadius is false it will be the constant radius used in pixels
+  "radius": 2,
+  "maxOpacity": .8,
+  // scales the radius based on map zoom
+  "scaleRadius": true,
+  // if set to false the heatmap uses the global maximum for colorization
+  // if activated: uses the data maximum within the current map boundaries
+  //   (there will always be a red spot with useLocalExtremas true)
+  "useLocalExtrema": true,
+  // which field name in your data represents the latitude - default "lat"
+  latField: 'lat',
+  // which field name in your data represents the longitude - default "lng"
+  lngField: 'lng',
+  // which field name in your data represents the data value - default "value"
+  valueField: 'count'
+};
 
-<!-- <script src="../node_modules/simpleheat/simpleheat.js"></script>
-<script src="../src/HeatLayer.js"></script>
- -->
-<script src="dist/leaflet-heat.js"></script>
 
-<script src="http://leaflet.github.io/Leaflet.markercluster/example/realworld.388.js"></script>
-<script>
-var map = L.map('map').setView([-37.82109, 175.2193], 16);
-var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
-addressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
-var heat = L.heatLayer(addressPoints).addTo(map),
-    draw = true;
-map.on({
-    movestart: function () { draw = false; },
-    moveend:   function () { draw = true; },
-    mousemove: function (e) {
-        if (draw) {
-            heat.addLatLng(e.latlng);
-        }
-    }
-})
-</script>
-</body>
-</html>
+var heatmapLayer = new HeatmapOverlay(cfg);
+
+var map = new L.Map('map-canvas', {
+  center: new L.LatLng(25.6586, -80.3568),
+  zoom: 4,
+  layers: [baseLayer, heatmapLayer]
+});
+
+heatmapLayer.setData(testData);
