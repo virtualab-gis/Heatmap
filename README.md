@@ -1,2 +1,2 @@
 # Heatmap
-https://github.com/virtualab-gis/Heatmap.git
+https://virtualab-gis.github.io/Heatmap/
